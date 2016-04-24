@@ -1,26 +1,9 @@
+
 #!/usr/bin/perl -w
-#=============================================================================
-#     FileName: get_fasta_in_list.pl
-#         Desc: 
-#       Author: Ben air	
-#        Email: 614347533@qq.com
-#     HomePage:https://github.com/Ben-unbelieveable/bioinformatic_script
-#      Version: 0.0.1
-#   LastChange: 2016-4-8
-#      History:
-#=============================================================================
-
-use strict;
-use Getopt::Long;
-
-
-=head1 Name
-
-get_fasta_in_list.pl  --  get the fasta sequence in the list from all data sequnce
 
 =head1 Description
 
-	Description
+        Description get_fasta_in_list.pl  --  get the fasta sequence in the list from all data sequnce
 
 =head1 Version
 
@@ -38,31 +21,36 @@ get_fasta_in_list.pl  --  get the fasta sequence in the list from all data sequn
   perl get_fasta_in_list.pl all.fa  list  out.fa
 
 =cut
+use Getopt::Long;
 
+die `pod2text $0` if (@ARGV == 0 || $ARGV[0] =~/help/);
 GetOptions(
   "fa|in-file=s"  =>\$pesoap,
   "list|in-file1=s"  =>\$sesoap,
   "out|out-file=s"    =>\$out_file
   );
-  
-die `pod2text $0` if (@ARGV == 0 || $Help);
+
+$out_unmat=$out_file."_unmatch";
 open FA, $pesoap or die "ERROR: open $pesoap: $!";
 open LIST, $sesoap or die "ERROR: open $sesoap: $!";
 open OUT, ">$out_file" or die "ERROR: open >$out_file: $!";
-
-while (defined($input=<INM>)) {
+open OUTUNMATCH, ">$out_unmat" or die "ERROR: open >$out_unmat: $!";
+while (defined($input=<FA>)) {
 chomp ($input);
-      if ($input=~/^>(\w+)/){
-	      $seqname=$1;
+      if ($input=~/gene:(\w+)/){
+              $seqname=$1;
        }else{
-		$seq_name{$seqname}.=$input;
+                $seq_name{$seqname}.=$input;
       }
 }
 
-while (defined($input=<INM>)) {
+while (defined($input=<LIST>)) {
 chomp ($input);
-	$output.=$input."\n".$seq_name{$input}."\n";
+        if(defined ($seq_name{$input})){
+        $output.=">".$input."\n".$seq_name{$input}."\n";
+        }else{
+        $out_unmatch.=$input."\n";
+        }
 }
-
-
 print OUT$output;
+print OUTUNMATCH$out_unmatch;
