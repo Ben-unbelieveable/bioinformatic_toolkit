@@ -1,0 +1,4 @@
+#!/bin/bash
+
+for i in `qstat | sed '1,2d' | awk '{print $1}' |less ` ; do echo -n "job-ID:"$i" " &&  qstat -j $i | grep script_file |sed 's#\s+#\s#g' ;done
+
